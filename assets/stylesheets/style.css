@@ -1,0 +1,68 @@
+
+#app {
+  height:100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+#friend-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1em
+}
+
+#friend-video-container {
+  flex-grow: 2;
+}
+
+#friend-video-player-container {
+  background-color: purple;
+  position: relative;
+  position: absolute;
+  height: 300px;
+  width: 300px;
+  display: flex;
+  justify-content: center;
+}
+
+#resizer {
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  bottom: 0;
+  right: 0;
+  cursor: se-resize;
+  position: absolute;
+}
+
+#friend-video-player {
+  height: 95%;
+  width: 90%;
+  margin:0 auto;
+}
+
+/* TODO: Remove for production, used for dev purposes only*/
+.friend-item {
+  height: 50px;
+  width: 50px;
+}
+
+.friend-image {
+  height: 100%;
+  width: 100%;
+  border-radius: 50%;
+}
+
+#friend-1 {
+  background-color: aqua;
+}
+
+#friend-2 {
+  background-color: purple;
+}
+
+#friend-3 {
+  background-color: yellow;
+}
