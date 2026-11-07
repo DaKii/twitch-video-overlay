@@ -1,0 +1,103 @@
+server {
+    root /home/ubuntu/video-overlay;
+    server_name deardiary.hopto.org; # <<== EDIT THIS
+    index index.php index.html index.htm index.cgi index.pl index.xhtml standard_index.html;
+
+   
+    location ~ /\. {
+        deny all;
+    }
+
+
+    location / {
+        try_files $uri $uri/ /index.php?$args;
+    }
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        include /etc/nginx/fastcgi_params;
+        fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_intercept_errors on;
+    }
+    
+    # Locations for users
+    # location /live
+    
+    
+    location /stat {
+        rtmp_stat all;
+        rtmp_stat_stylesheet stat.xsl;
+        add_header Refresh "8; $request_uri"; # Refreshes the stat page every 5 seconds.
+    }
+
+
+    location /stat.xsl {
+        root /home/ubuntu/video-overlay;
+    }
+    location /control {
+        rtmp_control all;
+    }
+    location /keys {
+        root /home/ubuntu/video-overlay;
+        autoindex off;
+    }
+    location /nginx_status {
+        stub_status on;
+        allow 127.0.0.1;
+    }
+    location /hls {
+        alias /home/ubuntu/video-overlay/hls; # Points to where the video fragment files are located
+        autoindex on; # Optional. Allow browsing of the video fragment files folder
+        expires -1; # Cache related
+        add_header Cache-Control no-cache;	# Prevent caching of HLS fragments
+        add_header Access-Control-Allow-Origin *; # Allow remote web players to access our playlist
+        types {
+            application/vnd.apple.mpegurl m3u8;
+            text/html html;
+            video/mp2t ts;
+        }
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*';
+            add_header 'Content-Length' 0;
+            return 204;
+        }
+    }
+    location /dash {
+        alias /home/ubuntu/video-overlay/dash;
+        autoindex on;
+        expires -1;
+        add_header Cache-Control no-cache;	# Prevent caching of HLS fragments
+        add_header Access-Control-Allow-Origin *; # Allow remote web player to access our playlist
+        types {
+            application/dash+xml mpd;
+            text/html html;
+            video/mp4 mp4;
+        }
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*';
+            add_header 'Content-Length' 0;
+            return 204;
+        }
+    }
+
+    listen [::]:443 ssl ipv6only=on; # managed by Certbot
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/deardiary.hopto.org/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/deardiary.hopto.org/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+server {
+    if ($host = deardiary.hopto.org) {
+        return 301 https://$host$request_uri;
+        } # managed by Certbot
+
+
+        listen 80;
+        listen [::]:80;
+        server_name deardiary.hopto.org;
+        return 404; # managed by Certbot
+
+
+    }

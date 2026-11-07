@@ -1,0 +1,8 @@
+# Backups
+*.backup
+*.bak
+*~
+
+# Machine-specific enabled configurations
+modules-enabled/
+sites-enabled/
